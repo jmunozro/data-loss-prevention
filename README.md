@@ -3,11 +3,12 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Identify your sensitive data](#identify-your-sensitive-data)
-- [Implement strong access controls](#implement-strong-access-controls)
-- [Utilize encryption and other security measures](#utilize-encryption-and-other-security-measures)
-- [Implement DLP policies](#implement-dlp-policies)
-- [Continuously monitor and update your data loss prevention strategy](#continuously-monitor-and-update-your-data-loss-prevention-strategy)
+1. [Identify your sensitive data](#identify-your-sensitive-data)
+2. [Implement strong access controls](#implement-strong-access-controls)
+3. [Utilize encryption and other security measures](#utilize-encryption-and-other-security-measures)
+4. [Implement DLP policies](#implement-dlp-policies)
+   - [Testing time!](#testing-time)
+5. [Continuously monitor and update your data loss prevention strategy](#continuously-monitor-and-update-your-data-loss-prevention-strategy)
 
 ## Introduction
 
@@ -190,6 +191,23 @@ spec:
         - regex: '((?:ASIA|AKIA|AROA|AIDA)([A-Z0-7]{16}))' # AWS key
         - regex: '([a-zA-Z0-9+/]{40})' # AWS secret
 ```
+
+### Testing time!
+
+Open the Istio Ingress Gateway external IP from a browser: https://172.18.1.4/forms/post
+
+![oauth2](./images/oauth2.png)
+
+Let's sign in with user2/password. We passed the first filter. Now we'll try to inject some malicious code:
+![form_malicious](./images/form_malicious.png)
+![blocked](./images/blocked.png)
+
+This time we'll include some valid personal data, that will be sent back from the upstream, and hopefully masked by the gateway before getting back to me.
+![form_ok](./images/form_ok.png)
+
+![result](./images/result.png)
+
+You can see how easy it is to add different layers of protection using Gloo Gateway policies!
 
 ## Continuously monitor and update your data loss prevention strategy
 
