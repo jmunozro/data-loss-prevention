@@ -198,12 +198,20 @@ Open the Istio Ingress Gateway external IP from a browser: https://172.18.1.4/fo
 
 ![oauth2](./images/oauth2.png)
 
-Let's sign in with user2/password. We passed the first filter. Now we'll try to inject some malicious code:
+Let's sign in with user2/passwordin order to pass the first defense filter.
+
+Now we'll try to inject some malicious code:
+
 ![form_malicious](./images/form_malicious.png)
+
+Oops! Looks like it didn't work
 ![blocked](./images/blocked.png)
 
 This time we'll include some valid personal data, that will be sent back from the upstream, and hopefully masked by the gateway before getting back to me.
+
 ![form_ok](./images/form_ok.png)
+
+As expected, our data is safe, even in the event of human errors
 
 ![result](./images/result.png)
 
