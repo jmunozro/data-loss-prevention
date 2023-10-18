@@ -95,36 +95,22 @@ apiVersion: security.policy.gloo.solo.io/v2
 kind: WAFPolicy
 metadata:
   name: basic-protection
-  namespace: bookinfo-frontends
+  namespace: httpbin
 spec:
   applyToRoutes:
   - route:
       labels:
         waf: "true"
   config:
-    coreRuleSetSettingsString: |
-      # default rules section
-      SecRuleEngine On
-      SecRequestBodyAccess On
-      # CRS section
-      # Will block by default
-      SecDefaultAction "phase:1,log,auditlog,deny,status:403"
-      SecDefaultAction "phase:2,log,auditlog,deny,status:403"
-      # only allow http2 connections
-      SecAction \
-        "id:900230,\
-          phase:1,\
-          nolog,\
-          pass,\
-          t:none,\
-          setvar:'tx.allowed_http_versions=HTTP/2 HTTP/2.0'"
-      SecAction \
-      "id:900990,\
-        phase:1,\
-        nolog,\
-        pass,\
-        t:none,\
-            setvar:tx.crs_setup_version=310"
+    disableCoreRuleSet: true
+    customRuleSets:
+    - ruleStr: |
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        SecRule REQUEST_HEADERS_NAMES "Proxy-Connection|Lock-Token|Content-Range|Translate|via|if" "log,deny,id:48,status:403,t:lowercase,msg:'Malicious header detected'"
+        SecRule REQUEST_LINE|ARGS|ARGS_NAMES|REQUEST_COOKIES|REQUEST_COOKIES_NAMES|REQUEST_BODY|REQUEST_HEADERS|XML:/*|XML://@*  
+          "@rx \\\${jndi:(?:ldaps?|iiop|dns|rmi)://" 
+          "id:1000,phase:2,deny,status:403,log,msg:'Potential Remote Command Execution: Log4j CVE-2021-44228'"
 ```
 
 And then a combination of *Authorization* with OAuth 2.0 protocol and *Authorization* with OPA
@@ -187,7 +173,7 @@ apiVersion: security.policy.gloo.solo.io/v2
 kind: DLPPolicy
 metadata:
   name: basic-dlp-policy
-  namespace: bookinfo-frontends
+  namespace: httpbin
 spec:
   applyToRoutes:
   - route:
@@ -199,15 +185,10 @@ spec:
     - predefinedAction: ALL_CREDIT_CARDS
     - predefinedAction: SSN
     - customAction:
-        maskChar: 'X'
-        name: test # only used for logging
-        percent: 75
         regexActions:
         - regex: '[0-9]{8,8}[A-Za-z]' # Spanish National ID number
-        - regex: '(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])' # AWS key
-          subgroup: 1
-        - regex: '(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])' # AWS secret
-          subgroup: 1
+        - regex: '((?:ASIA|AKIA|AROA|AIDA)([A-Z0-7]{16}))' # AWS key
+        - regex: '([a-zA-Z0-9+/]{40})' # AWS secret
 ```
 
 ## Continuously monitor and update your data loss prevention strategy
