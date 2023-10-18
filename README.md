@@ -195,4 +195,5 @@ spec:
 
 Data loss prevention is an ongoing process, and it's important to continuously monitor and update your strategy to ensure that it remains effective.
 
-Gloo Gateway allows easy integration with OpenTelemetry (OTel). To learn how to configure and set it up, check out [this blog series](https://www.solo.io/blog/service-mesh-for-developers-exploring-the-power-of-observability-and-opentelemetry/).
+Gloo Gateway allows easy integration with OpenTelemetry (OTel). To learn how to configure and set it up, check out
+[![Foo](https://www.solo.io/wp-content/uploads/2023/07/Service-Mesh-for-Developers-Part-1-Exploring-the-Power-of-Observability-and-OpenTelemetry.jpg.webp)](https://www.solo.io/blog/service-mesh-for-developers-exploring-the-power-of-observability-and-opentelemetry/)
